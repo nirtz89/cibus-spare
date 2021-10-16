@@ -1,0 +1,10 @@
+{
+  "name": "cibus",
+  "bin": "./bin/cibus.js",
+  "version": "1.0.0",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "dotenv": "^10.0.0",
+    "puppeteer": "^10.4.0"
+  }
+}
