@@ -5,33 +5,11 @@ const puppeteer = require('puppeteer');
 const chalk = require('chalk');
 const devices = puppeteer.devices;
 const iPhone = devices['iPhone 6'];
-
-function lastSunday() {
-    let currentDateObj = new Date();
-    currentDateObj.setDate(currentDateObj.getDate() - (currentDateObj.getDay()) % 7);
-    return currentDateObj;
-}
-
-function lastThursday() {
-    let currentDateObj = new Date();
-    currentDateObj.setDate(currentDateObj.getDate() - (currentDateObj.getDay() + 3) % 7);
-    return currentDateObj;
-}
-
-const getDatesBetweenDates = (startDate, endDate) => {
-    let dates = []
-    //to avoid modifying the original date
-    const theDate = new Date(startDate)
-    while (theDate < endDate) {
-      dates = [...dates, new Date(theDate)]
-      theDate.setDate(theDate.getDate() + 1)
-    }
-    dates = [...dates, endDate]
-    return dates;
-  }
+const dateUtils = require('../dateUtils');
+const loadingUtil = require('../commonUtils');
 
 const options = { year: '2-digit', month: '2-digit', day: '2-digit' };
-const dates = getDatesBetweenDates(lastSunday(), lastThursday()).map(d => d.toLocaleDateString("he-IL", options).replace(/\./g, '/'));
+const dates = dateUtils.getDatesBetweenDates(dateUtils.lastSunday(), new Date()).map(d => d.toLocaleDateString("he-IL", options).replace(/\./g, '/'));
 
 (async () => {
   const browser = await puppeteer.launch({
@@ -42,6 +20,7 @@ const dates = getDatesBetweenDates(lastSunday(), lastThursday()).map(d => d.toLo
       height:667
     }
   });
+  loadingUtil.loading();
   const page = await browser.newPage();
   await page.emulate(iPhone);
   await page.goto('https://www.mysodexo.co.il?mob=1');
@@ -56,12 +35,12 @@ const dates = getDatesBetweenDates(lastSunday(), lastThursday()).map(d => d.toLo
   await page.click("#btnLogin");
   await page.waitForTimeout(3000);
   await page.goto("https://www.mysodexo.co.il/new_my/new_my_orders.aspx");
-  await page.waitForTimeout(3000);
   let tblData = await page.evaluate(() => Array.from(document.querySelectorAll('.fixed-table.bar.foot tr:not(:first-of-type)'), e => ret = {
     date: e.querySelector("td:nth-child(2)").textContent,
     price: parseFloat(e.querySelector("td:nth-child(6) span").textContent)
   }));
   tblData = tblData.filter(td => {return dates.includes(td.date.trim())});
+  loadingUtil.stopLoading();
   const spent = tblData.reduce((acc,td) => acc + td.price,0);
   if (spent-process.env.CIBUS_WEEKLY >= 0) {
     console.log(`\n\rYou've spent ${chalk.bgRed(`₪${spent}`)}- no money left for this week\n\r`);
