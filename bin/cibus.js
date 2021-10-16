@@ -11,6 +11,14 @@ const loadingUtil = require('../commonUtils');
 const options = { year: '2-digit', month: '2-digit', day: '2-digit' };
 const dates = dateUtils.getDatesBetweenDates(dateUtils.lastSunday(), new Date()).map(d => d.toLocaleDateString("he-IL", options).replace(/\./g, '/'));
 
+if (!process.env.CIBUS_COMPANY 
+    || !process.env.CIBUS_PASSWORD
+    || !process.env.CIBUS_USER
+    || !process.env.CIBUS_WEEKLY) {
+    console.log(`\n\r${chalk.bgRed("Seems like your .env file is either empty or incomplete.")}\n\r`);
+    process.exit();
+}
+
 (async () => {
   const browser = await puppeteer.launch({
     args: [`--window-size=375,667`],
