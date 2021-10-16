@@ -63,10 +63,10 @@ const dates = getDatesBetweenDates(lastSunday(), lastThursday()).map(d => d.toLo
   }));
   tblData = tblData.filter(td => {return dates.includes(td.date.trim())});
   const spent = tblData.reduce((acc,td) => acc + td.price,0);
-  if (spent-360 >= 0) {
+  if (spent-process.env.CIBUS_WEEKLY >= 0) {
     console.log(`\n\rYou've spent ${chalk.bgRed(`₪${spent}`)}- no money left for this week\n\r`);
   } else {
-    console.log(`\n\rYou've spent ${chalk.bgRed(`₪${spent}`)} this week, you can still spend ${chalk.bgGreen(`₪${360-spent}`)}\n\r`);
+    console.log(`\n\rYou've spent ${chalk.bgRed(`₪${spent}`)} this week, you can still spend ${chalk.bgGreen(`₪${process.env.CIBUS_WEEKLY-spent}`)}\n\r`);
   }
   await browser.close();
 })();
