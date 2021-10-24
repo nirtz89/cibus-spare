@@ -3,7 +3,7 @@
 #
 How to run:
 1. Inside the main folder run `yarn`  
-2. Run `yarn link` from the main folder, or `sudo yarn link` if you're on Mac
+2. Run `npm link` from the main folder, or `sudo npm link` if you're on Mac
 3. Change `.env` to your Cibus details
 4. Now you can run `cibus` from anywhere
 
