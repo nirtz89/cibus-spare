@@ -7,6 +7,7 @@ const devices = puppeteer.devices;
 const iPhone = devices['iPhone 6'];
 const dateUtils = require('../dateUtils');
 const loadingUtil = require('../commonUtils');
+const	readlineSync = require('readline-sync');
 
 const options = { year: '2-digit', month: '2-digit', day: '2-digit' };
 const dates = dateUtils.getDatesBetweenDates(dateUtils.lastSunday(), new Date()).map(d => d.toLocaleDateString("he-IL", options).replace(/\./g, '/'));
@@ -21,6 +22,7 @@ if (!process.env.CIBUS_COMPANY
 
 (async () => {
   const browser = await puppeteer.launch({
+    headless: true,
     args: [`--window-size=375,667`],
     isMobile: true,
     defaultViewport: {
@@ -51,9 +53,25 @@ if (!process.env.CIBUS_COMPANY
   loadingUtil.stopLoading();
   const spent = tblData.reduce((acc,td) => acc + td.price,0);
   if (spent-process.env.CIBUS_WEEKLY >= 0) {
-    console.log(`\n\rYou've spent ${chalk.bgRed(`₪${spent}`)}- no money left for this week\n\r`);
+    console.log(`\n\rYou've spent ${chalk.red(`₪${spent}`)} - no money left for spending this week\n\r`);
   } else {
-    console.log(`\n\rYou've spent ${chalk.bgRed(`₪${spent}`)} this week, you can still spend ${chalk.bgGreen(`₪${process.env.CIBUS_WEEKLY-spent}`)}\n\r`);
+    console.log(`\n\rYou've spent ${chalk.red(`₪${spent}`)} this week, you can still spend ${chalk.green(`₪${process.env.CIBUS_WEEKLY-spent}`)}\n\r`);
+    if (readlineSync.keyInYN(`\n\r${chalk.green("Hey! You have some free money to spend, do you want me to buy 30 nis worth of Shufersal coupons?")}\n\r`)) {
+      loadingUtil.loading("Purchasing your coupon");
+      await page.goto("https://www.mysodexo.co.il/new_menu.aspx?restId=33193&cmp=2199&fav=0&h=17&m=2&s=223&g=0&weekend=&ta=1&name=%D7%A9%D7%95%D7%A4%D7%A8%D7%A1%D7%9C&dist=2");
+      await page.waitForSelector("big");
+      await page.click("big:nth-of-type(1)");
+      await page.goto("https://www.mysodexo.co.il/new_order2.aspx?restId=33193&ta=1");
+      await page.goto("https://www.mysodexo.co.il/new_menu.aspx?restId=33193&cmp=2199&fav=0&h=17&m=2&s=223&g=0&weekend=&ta=1&name=%D7%A9%D7%95%D7%A4%D7%A8%D7%A1%D7%9C&dist=2");
+      await page.goto("https://www.mysodexo.co.il/new_order2.aspx?restId=33193&ta=1");
+      await page.waitForSelector(".button.send");
+      await page.click(".button.send");
+      await page.click(".button.send");
+      console.log(`${chalk.green("Purchased! Bye!")}`);
+    } else {
+      console.log('OK, Bye.');
+    }
   }
+  loadingUtil.stopLoading();
   await browser.close();
 })();

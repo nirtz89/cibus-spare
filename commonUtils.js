@@ -1,13 +1,13 @@
 let loadingInterval = null;
 
-const loading = () => {
+const loading = (str = "Loading") => {
     var h = ['|', '/', '-', '\\'];
     var i = 0;
   
     loadingInterval = setInterval(() => {
       i = (i > 3) ? 0 : i;
       console.clear();
-      console.log(`Getting data... ${h[i]}`);
+      console.log(`${str}... ${h[i]}`);
       i++;
     }, 100);
 };

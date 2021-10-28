@@ -5,6 +5,7 @@
   "dependencies": {
     "chalk": "^4.1.2",
     "dotenv": "^10.0.0",
-    "puppeteer": "^10.4.0"
+    "puppeteer": "^10.4.0",
+    "readline-sync": "^1.4.10"
   }
 }
