@@ -50,8 +50,10 @@ if (!process.env.CIBUS_COMPANY
   tblData = tblData.filter(td => {return dates.includes(td.date.trim())});
   loadingUtil.stopLoading();
   const spent = tblData.reduce((acc,td) => acc + td.price,0);
-  if (spent-process.env.CIBUS_WEEKLY >= 0) {
-    console.log(`\n\rYou've spent ${chalk.bgRed(`₪${spent}`)}- no money left for this week\n\r`);
+  if (spent - process.env.CIBUS_WEEKLY > 0) {
+    console.log(`\n\rwoooow, calm down! You've spent ${chalk.bgRed(`₪${spent}`)} which is ${chalk.bgRed(`₪${spent - process.env.CIBUS_WEEKLY}`)} above your weekly budget!\n\r`);
+  } else if (spent - process.env.CIBUS_WEEKLY == 0) {
+    console.log(`\n\rYou've spent exactly ${chalk.bgRed(`₪${spent}`)} :) No money left for this week!\n\r`);
   } else {
     console.log(`\n\rYou've spent ${chalk.bgRed(`₪${spent}`)} this week, you can still spend ${chalk.bgGreen(`₪${process.env.CIBUS_WEEKLY-spent}`)}\n\r`);
   }
